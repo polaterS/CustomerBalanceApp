@@ -2,6 +2,13 @@
 
 <h2>Fatura Listesi</h2>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
 <form method="get">
     <table class="table">
         <thead>
@@ -11,7 +18,7 @@
                 <th>Fatura Tarihi</th>
                 <th>Fatura Tutarı</th>
                 <th>Ödeme Tarihi</th>
-                <th></th>
+                <th>Arama</th>
             </tr>
             <tr>
                 <th>
@@ -29,7 +36,9 @@
                 <th>
                     <input type="date" name="odemeTarihi" value="@Context.Request.Query["odemeTarihi"]" class="form-control" />
                 </th>
-                <th></th>
+                <th>
+                    <button type="submit" class="btn btn-primary">Ara</button>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -51,7 +60,5 @@
             }
         </tbody>
     </table>
-    <button type="submit" class="btn btn-primary">Ara</button>
 </form>
 
-<a href="@Url.Action("Create", "Fatura")" class="btn btn-primary">Yeni Fatura Ekle</a>

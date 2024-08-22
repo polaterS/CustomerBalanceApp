@@ -46,7 +46,7 @@ namespace MusteriApp.Data.Migrations
 
                     b.HasIndex("MUSTERI_ID");
 
-                    b.ToTable("musteri_fatura_table");
+                    b.ToTable("musteri_fatura_table", (string)null);
                 });
 
             modelBuilder.Entity("MusteriApp.Data.Entities.Musteri", b =>
@@ -64,7 +64,7 @@ namespace MusteriApp.Data.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("musteri_tanim_table");
+                    b.ToTable("musteri_tanim_table", (string)null);
                 });
 
             modelBuilder.Entity("MusteriApp.Data.Entities.Fatura", b =>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MusteriApp.Data.Entities;
+using MusteriApp.Services.Implementation;
 using MusteriApp.Services.Interface;
 using MusteriApp.Web.Models;
 
@@ -60,23 +61,6 @@ namespace MusteriApp.Web.Controllers
             if (fatura == null)
             {
                 return NotFound();
-            }
-            return View(fatura);
-        }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Fatura fatura)
-        {
-            if (ModelState.IsValid)
-            {
-                await _faturaService.AddFaturaAsync(fatura);
-                return RedirectToAction(nameof(Index));
             }
             return View(fatura);
         }

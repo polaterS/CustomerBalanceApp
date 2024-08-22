@@ -18,7 +18,7 @@ namespace MusteriApp.Web
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            // Register data and service layers
+            // Register data and service
             builder.Services.AddDataServices();
 
             var app = builder.Build();

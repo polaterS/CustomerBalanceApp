@@ -29,23 +29,6 @@ namespace MusteriApp.Web.Controllers
             return View(musteri);
         }
 
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Musteri musteri)
-        {
-            if (ModelState.IsValid)
-            {
-                await _musteriService.AddMusteriAsync(musteri);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(musteri);
-        }
-
         public async Task<IActionResult> Edit(int id)
         {
             var musteri = await _musteriService.GetMusteriByIdAsync(id);

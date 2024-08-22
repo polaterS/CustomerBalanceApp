@@ -29,7 +29,7 @@ namespace MusteriApp.Services.Implementation
 
         public async Task AddFaturaAsync(Fatura fatura)
         {
-            await _faturaRepository.AddAsync(fatura);
+             await _faturaRepository.AddAsync(fatura);
         }
 
         public async Task UpdateFaturaAsync(Fatura fatura)
