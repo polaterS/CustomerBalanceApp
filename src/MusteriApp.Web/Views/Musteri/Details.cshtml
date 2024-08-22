@@ -1,0 +1,26 @@
+﻿@model MusteriApp.Data.Entities.Musteri
+
+<h2>Müşteri Detayları</h2>
+
+<div>
+    <h4>@Model.UNVAN</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            ID
+        </dt>
+        <dd class="col-sm-10">
+            @Model.ID
+        </dd>
+        <dt class="col-sm-2">
+            Ünvan
+        </dt>
+        <dd class="col-sm-10">
+            @Model.UNVAN
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-primary">Düzenle</a>
+    <a asp-action="Index" class="btn btn-secondary">Geri</a>
+</div>

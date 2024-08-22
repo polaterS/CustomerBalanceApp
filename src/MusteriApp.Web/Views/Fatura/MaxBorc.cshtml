@@ -1,0 +1,13 @@
+﻿@model MaxBorcViewModel
+
+@{
+    ViewBag.Title = "Maksimum Borç Bilgisi";
+}
+
+<h2>Maksimum Borç Bilgisi</h2>
+
+<p>Müşteri ID: @Model.MUSTERI_ID</p> <!-- Bu satır artık çalışacaktır -->
+<p>Maksimum Borca Ulaşılan Tarih: @Model.MaxBorcTarihi</p>
+<p>Maksimum Borç: @Model.MaxBorc</p>
+
+<a href="@Url.Action("Index", "Fatura")" class="btn btn-primary">Fatura Listesine Geri Dön</a>

@@ -1,0 +1,57 @@
+﻿@model IEnumerable<MusteriApp.Data.Entities.Fatura>
+
+<h2>Fatura Listesi</h2>
+
+<form method="get">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Müşteri ID</th>
+                <th>Fatura Tarihi</th>
+                <th>Fatura Tutarı</th>
+                <th>Ödeme Tarihi</th>
+                <th></th>
+            </tr>
+            <tr>
+                <th>
+                    <input type="text" name="id" value="@Context.Request.Query["id"]" class="form-control" placeholder="ID Ara" />
+                </th>
+                <th>
+                    <input type="text" name="musteriId" value="@Context.Request.Query["musteriId"]" class="form-control" placeholder="Müşteri ID Ara" />
+                </th>
+                <th>
+                    <input type="date" name="faturaTarihi" value="@Context.Request.Query["faturaTarihi"]" class="form-control" />
+                </th>
+                <th>
+                    <input type="text" name="faturaTutari" value="@Context.Request.Query["faturaTutari"]" class="form-control" placeholder="Fatura Tutarı Ara" />
+                </th>
+                <th>
+                    <input type="date" name="odemeTarihi" value="@Context.Request.Query["odemeTarihi"]" class="form-control" />
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var fatura in Model)
+            {
+                <tr>
+                    <td>@fatura.ID</td>
+                    <td>@fatura.MUSTERI_ID</td>
+                    <td>@fatura.FATURA_TARIHI.ToShortDateString()</td>
+                    <td>@fatura.FATURA_TUTARI</td>
+                    <td>@fatura.ODEME_TARIHI?.ToShortDateString()</td>
+                    <td>
+                        <a href="@Url.Action("Details", "Fatura", new { id = fatura.ID })">Detaylar</a> |
+                        <a href="@Url.Action("Edit", "Fatura", new { id = fatura.ID })">Düzenle</a> |
+                        <a href="@Url.Action("Delete", "Fatura", new { id = fatura.ID })">Sil</a> |
+                        <a href="@Url.Action("MaxBorc", "Fatura", new { musteriId = fatura.MUSTERI_ID })" class="btn btn-info">Maksimum Borç Gör</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Ara</button>
+</form>
+
+<a href="@Url.Action("Create", "Fatura")" class="btn btn-primary">Yeni Fatura Ekle</a>

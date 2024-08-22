@@ -1,0 +1,29 @@
+﻿@model IEnumerable<MusteriApp.Data.Entities.Musteri>
+
+<h2>Müşteri Listesi</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Ünvan</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var musteri in Model)
+        {
+            <tr>
+                <td>@musteri.ID</td>
+                <td>@musteri.UNVAN</td>
+                <td>
+                    <a href="@Url.Action("Details", "Musteri", new { id = musteri.ID })">Detaylar</a> |
+                    <a href="@Url.Action("Edit", "Musteri", new { id = musteri.ID })">Düzenle</a> |
+                    <a href="@Url.Action("Delete", "Musteri", new { id = musteri.ID })">Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Create", "Musteri")" class="btn btn-primary">Yeni Müşteri Ekle</a>
