@@ -9,51 +9,92 @@ namespace MusteriApp.Web.Controllers
     public class FaturaController : Controller
     {
         private readonly IFaturaService _faturaService;
+        private readonly IMusteriService _musteriService;
 
-        public FaturaController(IFaturaService faturaService)
+        public FaturaController(IFaturaService faturaService, IMusteriService musteriService)
         {
             _faturaService = faturaService;
+            _musteriService = musteriService;
         }
 
-        public async Task<IActionResult> Index(string id, string musteriId, string faturaTarihi, string faturaTutari, string odemeTarihi)
+        //public async Task<IActionResult> Index()
+        //{
+        //    var faturalist = await _faturaService.GetAllFaturalarAsync();
+        //    var musteriler = await _musteriService.GetAllMusterilerAsync();
+
+        //    var musteriFaturaSayisi = faturalist
+        //        .GroupBy(f => f.MUSTERI_ID)
+        //        .ToDictionary(g => g.Key, g => g.Count());
+
+        //    var model = new FaturaViewModel
+        //    {
+        //        Musteriler = musteriler.ToList(),
+        //        Faturalar = faturalist.ToList(),
+        //        MusteriFaturaSayisi = musteriFaturaSayisi ?? new Dictionary<int, int>() 
+        //    };
+
+
+
+        //    return View(model);
+        //}
+
+
+        [HttpGet]
+        public async Task<IActionResult> Index(FaturaViewModel model)
         {
-            var faturalist = await _faturaService.GetAllFaturalarAsync();
+            // Tüm faturaları ve müşterileri getir
+            //var faturalar = await _faturaService.GetAllFaturalarAsync();
+            //var musteriler = await _musteriService.GetAllMusterilerAsync();
 
-            if (!string.IsNullOrEmpty(id))
+            var faturalar = await _faturaService.GetAllFaturalarAsync();
+            var musteriler = await _musteriService.GetAllMusterilerAsync();
+
+            var musteriFaturaSayisi = faturalar
+                .GroupBy(f => f.MUSTERI_ID)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            model.Musteriler = musteriler.ToList();
+            model.Faturalar = faturalar.ToList();
+            model.MusteriFaturaSayisi = musteriFaturaSayisi;
+
+            // Filtreleme işlemleri
+            if (!string.IsNullOrEmpty(model.Id))
             {
-                faturalist = faturalist.Where(f => f.ID.ToString().Contains(id)).ToList();
+                faturalar = faturalar.Where(f => f.ID.ToString().Contains(model.Id));
             }
 
-            if (!string.IsNullOrEmpty(musteriId))
+            if (model.SelectedMusteriIds != null && model.SelectedMusteriIds.Any())
             {
-                faturalist = faturalist.Where(f => f.MUSTERI_ID.ToString().Contains(musteriId)).ToList();
+                faturalar = faturalar.Where(f => model.SelectedMusteriIds.Contains(f.MUSTERI_ID));
             }
 
-            if (!string.IsNullOrEmpty(faturaTarihi))
+            if (model.FaturaTarihi.HasValue)
             {
-                DateTime faturaDate;
-                if (DateTime.TryParse(faturaTarihi, out faturaDate))
+                faturalar = faturalar.Where(f => f.FATURA_TARIHI.Date == model.FaturaTarihi.Value.Date);
+            }
+
+            if (!string.IsNullOrEmpty(model.FaturaTutari))
+            {
+                if (decimal.TryParse(model.FaturaTutari, out decimal faturaTutarDecimal))
                 {
-                    faturalist = faturalist.Where(f => f.FATURA_TARIHI.Date == faturaDate.Date).ToList();
+                    faturalar = faturalar.Where(f => f.FATURA_TUTARI == faturaTutarDecimal);
                 }
             }
 
-            if (!string.IsNullOrEmpty(faturaTutari))
+            if (model.OdemeTarihi.HasValue)
             {
-                faturalist = faturalist.Where(f => f.FATURA_TUTARI.ToString().Contains(faturaTutari)).ToList();
+                faturalar = faturalar.Where(f => f.ODEME_TARIHI.HasValue && f.ODEME_TARIHI.Value.Date == model.OdemeTarihi.Value.Date);
             }
 
-            if (!string.IsNullOrEmpty(odemeTarihi))
-            {
-                DateTime odemeDate;
-                if (DateTime.TryParse(odemeTarihi, out odemeDate))
-                {
-                    faturalist = faturalist.Where(f => f.ODEME_TARIHI.HasValue && f.ODEME_TARIHI.Value.Date == odemeDate.Date).ToList();
-                }
-            }
+            // Modeli doldur
+            model.Faturalar = faturalar.ToList();
+            model.Musteriler = musteriler.ToList();
 
-            return View(faturalist);
+            return View(model);
         }
+
+
+
 
         public async Task<IActionResult> Details(int id)
         {
@@ -112,16 +153,37 @@ namespace MusteriApp.Web.Controllers
 
         public async Task<IActionResult> MaxBorc(int musteriId)
         {
-            var (tarih, borc) = await _faturaService.GetMaxBorcByMusteriIdAsync(musteriId);
+            var faturalist = await _faturaService.GetFaturalarByMusteriIdAsync(musteriId);
+
+            decimal? maxBorc = 0;
+            DateTime? maxBorcTarihi = null;
+            decimal currentBorc = 0;
+
+            foreach (var fatura in faturalist.OrderBy(f => f.FATURA_TARIHI))
+            {
+                currentBorc += fatura.FATURA_TUTARI;
+
+                if (fatura.ODEME_TARIHI.HasValue)
+                {
+                    currentBorc -= fatura.FATURA_TUTARI;
+                }
+
+                if (currentBorc > maxBorc)
+                {
+                    maxBorc = currentBorc;
+                    maxBorcTarihi = fatura.FATURA_TARIHI;
+                }
+            }
 
             var model = new MaxBorcViewModel
             {
                 MUSTERI_ID = musteriId,
-                MaxBorcTarihi = tarih?.ToShortDateString(),
-                MaxBorc = borc
+                MaxBorcTarihi = maxBorcTarihi?.ToShortDateString(),
+                MaxBorc = maxBorc
             };
 
             return View(model);
         }
+
     }
 }

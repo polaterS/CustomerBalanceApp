@@ -11,6 +11,7 @@ namespace MusteriApp.Services.Implementation
         private readonly IFaturaRepository _faturaRepository;
         private readonly MusteriAppContext _context;
 
+
         public FaturaService(IFaturaRepository faturaRepository, MusteriAppContext context)
         {
             _faturaRepository = faturaRepository;
@@ -49,15 +50,35 @@ namespace MusteriApp.Services.Implementation
 
         public async Task<(DateTime? Tarih, decimal? Borc)> GetMaxBorcByMusteriIdAsync(int musteriId)
         {
-            var maxBorcData = await _context.Faturalar
-                                            .Where(f => f.MUSTERI_ID == musteriId)
-                                            .OrderByDescending(f => f.FATURA_TUTARI)
-                                            .FirstOrDefaultAsync();
+            var faturalar = await _context.Faturalar
+                                          .Where(f => f.MUSTERI_ID == musteriId)
+                                          .OrderBy(f => f.FATURA_TARIHI)
+                                          .ToListAsync();
 
-            if (maxBorcData == null)
-                return (null, null);
+            decimal bakiye = 0;
+            decimal maxBakiye = 0;
+            DateTime? maxBorcTarihi = null;
 
-            return (maxBorcData.FATURA_TARIHI, maxBorcData.FATURA_TUTARI);
+            foreach (var fatura in faturalar)
+            {
+                if (fatura.ODEME_TARIHI == null)
+                {
+                    bakiye += fatura.FATURA_TUTARI;
+                }
+                else 
+                {
+                    bakiye -= fatura.FATURA_TUTARI;
+                }
+
+                if (bakiye > maxBakiye)
+                {
+                    maxBakiye = bakiye;
+                    maxBorcTarihi = fatura.FATURA_TARIHI;
+                }
+            }
+
+            return (maxBorcTarihi, maxBakiye);
         }
+
     }
 }
